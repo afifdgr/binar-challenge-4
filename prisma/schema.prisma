@@ -44,6 +44,7 @@ model bank_account_transactions {
   source_account_id      Int
   destination_account_id Int
   amount                 BigInt
+  created_at             DateTime       @default(now())
   source_account         bank_accounts? @relation("source_account", fields: [source_account_id], references: [id])
   destination_account    bank_accounts? @relation("destination_account", fields: [destination_account_id], references: [id])
 }

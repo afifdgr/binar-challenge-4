@@ -38,6 +38,7 @@ CREATE TABLE `bank_account_transactions` (
     `source_account_id` INTEGER NOT NULL,
     `destination_account_id` INTEGER NOT NULL,
     `amount` BIGINT NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

@@ -46,13 +46,34 @@ const getAccountById = async (req, res) => {
       balance: parseInt(account.balance),
     };
 
+    const transactions = await prisma.bank_account_transactions.findMany({
+      where: {
+        source_account_id: parseInt(accountId),
+      },
+      take: 5,
+      orderBy: {
+        id: "desc",
+      },
+    });
+
+    const historyTransaction = transactions.map((transaction) => {
+      return {
+        ...transaction,
+        amount: parseInt(transaction.amount),
+      };
+    });
+
     return res.status(201).json({
       error: false,
       message: "Fetched data bank account by id successfully",
       data: response,
+      latestTransaction: historyTransaction,
     });
   } catch (error) {
     console.log(error);
+    return res
+      .status(500)
+      .json({ error: true, message: "Internal Server Error" });
   }
 };
 
