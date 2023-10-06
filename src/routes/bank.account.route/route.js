@@ -10,8 +10,8 @@ const {
 const router = express.Router();
 
 // ACCOUNT Route
-router.post("/account", createAccount);
-router.get("/account", getAccounts);
-router.get("/account/:accountId", getAccountById);
+router.post("/accounts", createAccount);
+router.get("/accounts", getAccounts);
+router.get("/accounts/:accountId", getAccountById);
 
 module.exports = router;

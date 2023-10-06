@@ -14,17 +14,10 @@ const createAccount = async (req, res) => {
       return res.status(404).json({ error: true, message: "User Not Found" });
     }
 
-    const existingAccount = await prisma.bank_accounts.findUnique({
-      where: { user_id: parseInt(user_id) },
-    });
-
-    if (existingAccount) {
+    if (balance < 100000)
       return res
-        .status(404)
-        .json({ error: true, message: "Bank Account Registered" });
-    }
-
-    const balanceInt = parseInt(balance);
+        .status(400)
+        .json({ error: true, message: "Minimum Balance is 100000" });
 
     const response = await prisma.bank_accounts.create({
       data: {
@@ -36,6 +29,8 @@ const createAccount = async (req, res) => {
         },
       },
     });
+
+    const balanceInt = parseInt(balance);
 
     return res.status(201).json({
       error: false,
