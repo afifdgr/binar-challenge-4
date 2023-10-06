@@ -11,6 +11,13 @@ const createTransaction = async (req, res) => {
     },
   });
 
+  if (source_account_id === destination_account_id) {
+    return res.status(400).json({
+      error: true,
+      message: "source_account_id and destination_account_id must different",
+    });
+  }
+
   if (!existingSourceAccount)
     return res
       .status(404)
