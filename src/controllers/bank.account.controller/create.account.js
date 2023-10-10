@@ -3,11 +3,13 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const createAccount = async (req, res) => {
-  const { bank_name, bank_account_number, balance, user_id } = req.body;
+  let { bank_name, bank_account_number, balance, user_id } = req.body;
+  balance = parseInt(balance);
+  user_id = parseInt(user_id);
 
   try {
     const existingUser = await prisma.users.findUnique({
-      where: { id: parseInt(user_id) },
+      where: { id: user_id },
     });
 
     if (!existingUser) {
@@ -23,14 +25,14 @@ const createAccount = async (req, res) => {
       data: {
         bank_name: bank_name,
         bank_account_number: bank_account_number,
-        balance: BigInt(balance),
+        balance: balance,
         user: {
-          connect: { id: parseInt(user_id) },
+          connect: { id: user_id },
         },
       },
     });
 
-    const balanceInt = parseInt(balance);
+    const balanceInt = balance;
 
     return res.status(201).json({
       error: false,

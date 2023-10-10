@@ -3,11 +3,14 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const createTransaction = async (req, res) => {
-  const { source_account_id, destination_account_id, amount } = req.body;
+  let { source_account_id, destination_account_id, amount } = req.body;
+  source_account_id = parseInt(source_account_id);
+  destination_account_id = parseInt(destination_account_id);
+  amount = parseInt(amount);
 
   const existingSourceAccount = await prisma.bank_accounts.findUnique({
     where: {
-      id: parseInt(source_account_id),
+      id: source_account_id,
     },
   });
 
@@ -30,7 +33,7 @@ const createTransaction = async (req, res) => {
 
   const existingDestinationAccount = await prisma.bank_accounts.findUnique({
     where: {
-      id: parseInt(destination_account_id),
+      id: destination_account_id,
     },
   });
 
@@ -42,27 +45,31 @@ const createTransaction = async (req, res) => {
   await prisma.bank_account_transactions
     .create({
       data: {
-        source_account_id: parseInt(source_account_id),
-        destination_account_id: parseInt(destination_account_id),
-        amount: BigInt(amount),
+        /* source_account_id: source_account_id,
+        destination_account_id: destination_account_id, */
+        amount: amount,
+        source_account: { connect: { id: source_account_id } }, // Hubungkan dengan akun sumber
+        destination_account: {
+          connect: { id: destination_account_id },
+        },
       },
     })
     .then(() => {
       return prisma.bank_accounts.update({
-        where: { id: parseInt(source_account_id) },
+        where: { id: source_account_id },
         data: {
           balance: {
-            decrement: BigInt(amount),
+            decrement: amount,
           },
         },
       });
     })
     .then(() => {
       return prisma.bank_accounts.update({
-        where: { id: parseInt(destination_account_id) },
+        where: { id: destination_account_id },
         data: {
           balance: {
-            increment: BigInt(amount),
+            increment: amount,
           },
         },
       });
