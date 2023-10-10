@@ -4,12 +4,25 @@ const prisma = new PrismaClient();
 
 const getAccounts = async (req, res) => {
   try {
-    const accounts = await prisma.bank_accounts.findMany();
+    const accounts = await prisma.bank_accounts.findMany({
+      include: {
+        user: true,
+        source_transaction: true,
+        destination_transaction: true,
+      },
+    });
+
+    if (!accounts)
+      return res
+        .status(404)
+        .json({ error: true, message: "Account Not Found" });
 
     const response = accounts.map((account) => {
       return {
-        ...account,
+        bank_account_id: parseInt(account.id),
+        bank_name: account.bank_name,
         balance: parseInt(account.balance),
+        user_id: parseInt(account.user.id),
       };
     });
 
@@ -34,21 +47,28 @@ const getAccountById = async (req, res) => {
       where: {
         id: parseInt(accountId),
       },
+      include: {
+        user: true,
+        source_transaction: true,
+        destination_transaction: true,
+      },
     });
 
     if (!account)
       return res
         .status(404)
-        .json({ error: true, message: "Bank Account Not Found" });
+        .json({ error: true, message: "Account Not Found" });
 
     const response = {
-      ...account,
+      bank_account_id: parseInt(account.id),
+      bank_name: account.bank_name,
       balance: parseInt(account.balance),
+      user_id: parseInt(account.user.id),
     };
 
     const transactions = await prisma.bank_account_transactions.findMany({
       where: {
-        source_account_id: parseInt(accountId),
+        source_account_id: parseInt(account.id),
       },
       take: 5,
       orderBy: {
@@ -58,14 +78,16 @@ const getAccountById = async (req, res) => {
 
     const historyTransaction = transactions.map((transaction) => {
       return {
-        ...transaction,
+        transaction_id: parseInt(transaction.id),
+        source_account: parseInt(transaction.source_account_id),
+        destination_account: parseInt(transaction.destination_account_id),
         amount: parseInt(transaction.amount),
       };
     });
 
     return res.status(201).json({
       error: false,
-      message: "Fetched data bank account by id successfully",
+      message: "Fetched data bank account successfully",
       data: response,
       latestTransaction: historyTransaction,
     });
