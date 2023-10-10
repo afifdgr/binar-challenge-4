@@ -11,6 +11,12 @@ const getUsers = async (req, res) => {
       },
     });
 
+    if (!users)
+      return res.status(404).json({
+        error: true,
+        message: "User Not Found",
+      });
+
     const response = users.map((user) => ({
       id: user.id,
       name: user.name,
