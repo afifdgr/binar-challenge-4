@@ -1,7 +1,7 @@
 const express = require("express");
-const userRoutes = require("./user.route/route.js");
-const bankAccountRoutes = require("./bank.account.route/route.js");
-const transactionRoutes = require("./transaction.route/route.js");
+const userRoutes = require("./user.routes");
+const bankAccountRoutes = require("./bankAccount.routes");
+const transactionRoutes = require("./transaction.routes");
 
 const router = express.Router();
 
