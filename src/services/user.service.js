@@ -1,6 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
 const HashData = require("../utils/hashData.utils");
-
 const prisma = new PrismaClient();
 
 module.exports = {
@@ -8,6 +7,16 @@ module.exports = {
     try {
       const { name, email, password, identity_number, identity_type, address } =
         payload;
+
+      const existingEmail = await prisma.users.findFirst({
+        where: {
+          email: email,
+        },
+      });
+
+      if (existingEmail) {
+        throw new Error("Email already exists");
+      }
 
       const hashedPassword = await HashData.create(password);
       const serviceResponse = await prisma.users.create({
@@ -28,6 +37,7 @@ module.exports = {
       return serviceResponse;
     } catch (error) {
       console.log(error);
+      return { error: error.message };
     }
   },
 
@@ -39,8 +49,6 @@ module.exports = {
           bank_accounts: true,
         },
       });
-
-      if (!users) return console.log("User Not Found");
 
       const serviceResponse = users.map((user) => ({
         id: user.id,
@@ -77,6 +85,10 @@ module.exports = {
         },
       });
 
+      if (!user) {
+        throw new Error("User Not Found");
+      }
+
       const serviceResponse = {
         id: user.id,
         name: user.name,
@@ -96,6 +108,9 @@ module.exports = {
       };
 
       return serviceResponse;
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+      return { error: error.message };
+    }
   },
 };

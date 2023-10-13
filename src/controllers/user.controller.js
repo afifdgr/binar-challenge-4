@@ -1,12 +1,13 @@
-const { PrismaClient } = require("@prisma/client");
 const UserService = require("../services/user.service");
-
-const prisma = new PrismaClient();
+const ApiResponse = require("../utils/apiResponse");
 
 module.exports = {
   register: async (req, res) => {
     try {
       const serviceResponse = await UserService.register(req.body);
+      if (serviceResponse.error) {
+        return res.json(ApiResponse.error(serviceResponse.error));
+      }
       const apiResponse = {
         name: serviceResponse.name,
         email: serviceResponse.email,
@@ -25,18 +26,20 @@ module.exports = {
       return res.json({ data: serviceResponse });
     } catch (error) {
       console.error("Error fetching users:", error);
-      return res
-        .status(500)
-        .json({ error: true, message: "Internal Server Error" });
+      return res.json(error);
     }
   },
 
   getUserById: async (req, res) => {
     try {
       const serviceResponse = await UserService.getUserById(req);
+      if (serviceResponse.error) {
+        return res.json(ApiResponse.error(serviceResponse.error));
+      }
       return res.json({ data: serviceResponse });
     } catch (error) {
       console.log(error);
+      return res.json(error);
     }
   },
 };
