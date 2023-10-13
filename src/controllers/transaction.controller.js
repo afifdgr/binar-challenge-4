@@ -47,10 +47,8 @@ module.exports = {
     await prisma.bank_account_transactions
       .create({
         data: {
-          /* source_account_id: source_account_id,
-        destination_account_id: destination_account_id, */
           amount: amount,
-          source_account: { connect: { id: source_account_id } }, // Hubungkan dengan akun sumber
+          source_account: { connect: { id: source_account_id } },
           destination_account: {
             connect: { id: destination_account_id },
           },

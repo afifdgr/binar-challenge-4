@@ -16,10 +16,7 @@ module.exports = {
         },
       });
 
-      if (existingEmail) {
-        const serviceResponse = ApiResponse.error("Email Already Register");
-        return serviceResponse;
-      }
+      if (existingEmail) return ApiResponse.error("Email Already Register");
 
       const hashedPassword = await HashData.create(password);
       const user = await prisma.users.create({
@@ -37,11 +34,7 @@ module.exports = {
         },
       });
       user.password = undefined;
-      const serviceResponse = ApiResponse.success(
-        "Register User Successfully",
-        user
-      );
-      return serviceResponse;
+      return ApiResponse.success("Register User Successfully", user);
     } catch (error) {
       console.log(error);
       return { error: error.message };
@@ -73,11 +66,7 @@ module.exports = {
         })),
       }));
 
-      const serviceResponse = ApiResponse.success(
-        "Fetched data all user successfully",
-        data
-      );
-      return serviceResponse;
+      return ApiResponse.success("Fetched data all user successfully", data);
     } catch (error) {
       console.log(error);
     }
@@ -119,11 +108,7 @@ module.exports = {
         })),
       };
 
-      const serviceResponse = ApiResponse.success(
-        "Fetched data user by id successfully",
-        data
-      );
-      return serviceResponse;
+      return ApiResponse.success("Fetched data user by id successfully", data);
     } catch (error) {
       console.log(error);
     }

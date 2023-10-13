@@ -18,7 +18,7 @@ module.exports = {
       const serviceResponse = await UserService.getUsers();
       return res.json(serviceResponse);
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error(error);
       return res.json(error);
     }
   },
