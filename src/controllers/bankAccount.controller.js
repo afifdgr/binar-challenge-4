@@ -1,6 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
 const AccountService = require("../services/bankAccount.service");
-const prisma = new PrismaClient();
 
 module.exports = {
   createAccount: async (req, res) => {
@@ -33,7 +31,6 @@ module.exports = {
       return res.json(serviceResponse);
     } catch (error) {
       console.log(error);
-      return res.json(error);
     }
   },
 };

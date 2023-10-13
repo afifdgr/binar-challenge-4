@@ -16,7 +16,7 @@ model profiles {
   identity_number String
   address         String
   user_id         Int    @unique
-  user            users  @relation(fields: [user_id], references: [id])
+  user            users  @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model users {
@@ -24,7 +24,7 @@ model users {
   name          String
   email         String
   password      String
-  profile       profiles?
+  profile       profiles?       
   bank_accounts bank_accounts[]
 }
 
@@ -34,7 +34,7 @@ model bank_accounts {
   bank_account_number     String
   balance                 BigInt
   user_id                 Int                        
-  user                    users                       @relation(fields: [user_id], references: [id])
+  user                    users                       @relation(fields: [user_id], references: [id], onDelete: Cascade)
   source_transaction      bank_account_transactions[] @relation("source_account")
   destination_transaction bank_account_transactions[] @relation("destination_account")
 }
@@ -45,6 +45,6 @@ model bank_account_transactions {
   destination_account_id Int
   amount                 BigInt
   created_at             DateTime       @default(now())
-  source_account         bank_accounts? @relation("source_account", fields: [source_account_id], references: [id])
-  destination_account    bank_accounts? @relation("destination_account", fields: [destination_account_id], references: [id])
+  source_account         bank_accounts? @relation("source_account", fields: [source_account_id], references: [id], onDelete: Cascade)
+  destination_account    bank_accounts? @relation("destination_account", fields: [destination_account_id], references: [id], onDelete: Cascade)
 }

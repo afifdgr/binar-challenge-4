@@ -7,6 +7,7 @@ module.exports = {
       return hashedData;
     } catch (error) {
       console.log(error);
+      return ApiResponse.error("Internal Server Error");
     }
   },
 };

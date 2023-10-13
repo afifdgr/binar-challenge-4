@@ -2,7 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const HashData = require("../utils/hashData.utils");
 const prisma = new PrismaClient();
 
-const ApiResponse = require("../utils/apiResponse");
+const ApiResponse = require("../utils/apiResponse.utils");
 
 module.exports = {
   register: async (payload) => {
@@ -37,7 +37,7 @@ module.exports = {
       return ApiResponse.success("Register User Successfully", user);
     } catch (error) {
       console.log(error);
-      return { error: error.message };
+      return ApiResponse.error("Internal Server Error");
     }
   },
 
@@ -69,6 +69,7 @@ module.exports = {
       return ApiResponse.success("Fetched data all user successfully", data);
     } catch (error) {
       console.log(error);
+      return ApiResponse.error("Internal Server Error");
     }
   },
 
@@ -111,6 +112,74 @@ module.exports = {
       return ApiResponse.success("Fetched data user by id successfully", data);
     } catch (error) {
       console.log(error);
+      return ApiResponse.error("Internal Server Error");
+    }
+  },
+
+  updateUser: async (id, payload) => {
+    try {
+      const { name, email, identity_number, identity_type, address } = payload;
+
+      const existingUser = await prisma.users.findUnique({
+        where: {
+          id: parseInt(id),
+        },
+      });
+
+      if (!existingUser) {
+        return ApiResponse.error("User not found");
+      }
+
+      const updateData = {
+        name: name || existingUser.name,
+        email: email || existingUser.email,
+        profile: {
+          update: {
+            identity_number:
+              identity_number || existingUser.profile.identity_number,
+            identity_type: identity_type || existingUser.profile.identity_type,
+            address: address || existingUser.profile.address,
+          },
+        },
+      };
+
+      const updatedUser = await prisma.users.update({
+        where: {
+          id: parseInt(id),
+        },
+        data: updateData,
+      });
+
+      return ApiResponse.success("User Updated Successfully", updatedUser);
+    } catch (error) {
+      console.log(error);
+      return ApiResponse.error("Internal Server Error");
+    }
+  },
+
+  deleteUser: async (req) => {
+    try {
+      const { id } = req.params;
+      const existingUser = await prisma.users.findUnique({
+        where: {
+          id: parseInt(id),
+        },
+      });
+
+      if (!existingUser) {
+        return ApiResponse.error("User not found");
+      }
+
+      await prisma.users.delete({
+        where: {
+          id: parseInt(id),
+        },
+      });
+
+      return ApiResponse.success("User Deleted Successfully");
+    } catch (error) {
+      console.log(error);
+      throw ApiResponse.error(error.message);
     }
   },
 };

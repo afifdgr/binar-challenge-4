@@ -1,5 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
-const ApiResponse = require("../utils/apiResponse");
+const ApiResponse = require("../utils/apiResponse.utils");
 
 const prisma = new PrismaClient();
 
@@ -15,9 +15,6 @@ module.exports = {
       });
 
       if (!existingUser) return ApiResponse.error("User Not Found");
-
-      if (balance < 100000)
-        return ApiResponse.error("Minimum Balance is 100000");
 
       const account = await prisma.bank_accounts.create({
         data: {
@@ -37,6 +34,7 @@ module.exports = {
       return ApiResponse.success("Create Bank Account Successfully", data);
     } catch (error) {
       console.log(error);
+      return ApiResponse.error("Internal Server Error");
     }
   },
 
@@ -63,6 +61,7 @@ module.exports = {
       );
     } catch (error) {
       console.log(error);
+      return ApiResponse.error("Internal Server Error");
     }
   },
 
@@ -120,6 +119,7 @@ module.exports = {
       );
     } catch (error) {
       console.log(error);
+      return ApiResponse.error("Internal Server Error");
     }
   },
 };
