@@ -2,6 +2,8 @@ const { PrismaClient } = require("@prisma/client");
 const HashData = require("../utils/hashData.utils");
 const prisma = new PrismaClient();
 
+const ApiResponse = require("../utils/apiResponse");
+
 module.exports = {
   register: async (payload) => {
     try {
@@ -15,11 +17,12 @@ module.exports = {
       });
 
       if (existingEmail) {
-        throw new Error("Email already exists");
+        const serviceResponse = ApiResponse.error("Email Already Register");
+        return serviceResponse;
       }
 
       const hashedPassword = await HashData.create(password);
-      const serviceResponse = await prisma.users.create({
+      const user = await prisma.users.create({
         data: {
           name: name,
           email: email,
@@ -33,7 +36,11 @@ module.exports = {
           },
         },
       });
-      serviceResponse.password = undefined;
+      user.password = undefined;
+      const serviceResponse = ApiResponse.success(
+        "Register User Successfully",
+        user
+      );
       return serviceResponse;
     } catch (error) {
       console.log(error);
@@ -50,7 +57,7 @@ module.exports = {
         },
       });
 
-      const serviceResponse = users.map((user) => ({
+      const data = users.map((user) => ({
         id: user.id,
         name: user.name,
         email: user.email,
@@ -66,6 +73,10 @@ module.exports = {
         })),
       }));
 
+      const serviceResponse = ApiResponse.success(
+        "Fetched data all user successfully",
+        data
+      );
       return serviceResponse;
     } catch (error) {
       console.log(error);
@@ -86,10 +97,11 @@ module.exports = {
       });
 
       if (!user) {
-        throw new Error("User Not Found");
+        const serviceResponse = ApiResponse.error("User Not Found");
+        return serviceResponse;
       }
 
-      const serviceResponse = {
+      const data = {
         id: user.id,
         name: user.name,
         email: user.email,
@@ -107,10 +119,13 @@ module.exports = {
         })),
       };
 
+      const serviceResponse = ApiResponse.success(
+        "Fetched data user by id successfully",
+        data
+      );
       return serviceResponse;
     } catch (error) {
       console.log(error);
-      return { error: error.message };
     }
   },
 };

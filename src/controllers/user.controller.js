@@ -1,20 +1,13 @@
 const UserService = require("../services/user.service");
-const ApiResponse = require("../utils/apiResponse");
 
 module.exports = {
   register: async (req, res) => {
     try {
       const serviceResponse = await UserService.register(req.body);
       if (serviceResponse.error) {
-        return res.json(ApiResponse.error(serviceResponse.error));
+        return res.json(serviceResponse);
       }
-      const apiResponse = {
-        name: serviceResponse.name,
-        email: serviceResponse.email,
-      };
-      return res
-        .status(201)
-        .json({ message: "Register Successfully", data: apiResponse });
+      return res.json(serviceResponse);
     } catch (error) {
       console.log(error);
     }
@@ -23,7 +16,7 @@ module.exports = {
   getUsers: async (req, res) => {
     try {
       const serviceResponse = await UserService.getUsers();
-      return res.json({ data: serviceResponse });
+      return res.json(serviceResponse);
     } catch (error) {
       console.error("Error fetching users:", error);
       return res.json(error);
@@ -34,9 +27,9 @@ module.exports = {
     try {
       const serviceResponse = await UserService.getUserById(req);
       if (serviceResponse.error) {
-        return res.json(ApiResponse.error(serviceResponse.error));
+        return res.json(serviceResponse);
       }
-      return res.json({ data: serviceResponse });
+      return res.json(serviceResponse);
     } catch (error) {
       console.log(error);
       return res.json(error);
